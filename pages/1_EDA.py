@@ -135,6 +135,27 @@ fig.update_layout(height=500, yaxis_title='Merkmal',
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
+st.subheader("Korrelationsmatrix (Top-12 Merkmale)")
+st.markdown("Pearson-Korrelation der 12 Merkmale mit der stärksten Korrelation zur Zielvariable.")
+
+corr_with_target = df_all[feat_cols + ['class']].corr()['class'].drop('class')
+top12_features   = corr_with_target.abs().sort_values(ascending=False).head(12).index.tolist()
+corr_matrix      = df_all[top12_features + ['class']].corr()
+corr_matrix.index   = [c.split('_')[0] for c in corr_matrix.index]
+corr_matrix.columns = [c.split('_')[0] for c in corr_matrix.columns]
+
+fig = px.imshow(
+    corr_matrix,
+    color_continuous_scale='RdBu_r',
+    color_continuous_midpoint=0,
+    zmin=-1, zmax=1,
+    text_auto='.2f',
+    title='Pearson-Korrelationsmatrix (Top-12 Merkmale nach Korrelation mit Zielvariable)'
+)
+fig.update_layout(height=550)
+st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("---")
 st.subheader("Ausreißer-Analyse")
 st.markdown("Anteil extremer Werte pro Merkmal (mehr als 3-facher IQR-Abstand).")
 
