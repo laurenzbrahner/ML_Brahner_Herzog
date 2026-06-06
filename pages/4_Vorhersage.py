@@ -11,7 +11,7 @@ st.title("Interaktive Insolvenzvorhersage")
 st.markdown("""
 Geben Sie die Finanzkennzahlen eines Unternehmens ein und erhalten Sie eine Vorhersage
 des Insolvenzrisikos. Alle Felder sind mit dem Trainingsmedian vorbelegt.
-Das Modell wurde mit allen 63 Merkmalen trainiert und benötigt alle Werte für eine zuverlässige Vorhersage.
+Das Modell wurde mit 63 Finanzkennzahlen und einem Missing-Indikator für X21 trainiert (64 Merkmale gesamt).
 """)
 
 MODELS_DIR = 'models'
@@ -180,7 +180,7 @@ if submitted:
             st.markdown(f"**Bankrott-Wahrscheinlichkeit: {proba:.1%}**")
 
         st.markdown(f"Der Entscheidungsschwellenwert liegt bei 50 %. "
-                    f"Das Modell basiert auf allen 63 Merkmalen.")
+                    f"Das Modell basiert auf 63 Finanzkennzahlen + X21_missing-Indikator.")
 
     with col_gauge:
         fig = px.bar(x=['Bankrott-Wahrscheinlichkeit'], y=[proba * 100],
