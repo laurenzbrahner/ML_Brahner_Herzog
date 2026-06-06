@@ -61,7 +61,7 @@ feat_cols = [c for c in df_all.columns if c not in ['class', 'year']]
 
 st.markdown("""
 Der Datensatz umfasst Jahresabschlussdaten polnischer Unternehmen aus dem Zeitraum 2000 bis 2013.
-Fuenf Teildatensaetze entsprechen fuenf unterschiedlichen Prognosehorizonten.
+Fünf Teildatensätze entsprechen fünf unterschiedlichen Prognosehorizonten.
 """)
 
 col1, col2, col3 = st.columns(3)
@@ -114,7 +114,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 st.subheader("Top-20 Merkmale nach Trennkraft (Median-Differenz)")
-st.markdown("Positive Werte bedeuten: bankrotte Unternehmen haben hoehere Werte. Negative Werte: gesunde Unternehmen haben hoehere Werte.")
+st.markdown("Positive Werte bedeuten, dass bankrotte Unternehmen höhere Werte aufweisen. Negative Werte bedeuten, dass gesunde Unternehmen höhere Werte aufweisen.")
 
 medians = df_all.groupby('class')[feat_cols].median().T
 medians.columns = ['Nicht bankrott', 'Bankrott']
@@ -123,15 +123,19 @@ top20 = medians.reindex(medians['diff_norm'].abs().sort_values(ascending=True).i
 top20.columns = ['Feature', 'Nicht bankrott', 'Bankrott', 'Norm. Differenz']
 top20['Feature_kurz'] = top20['Feature'].str.split('_').str[0]
 
+top20['Farbe'] = top20['Norm. Differenz'].apply(
+    lambda x: 'Bankrott hoeher' if x > 0 else 'Gesund hoeher')
+
 fig = px.bar(top20, x='Norm. Differenz', y='Feature_kurz', orientation='h',
-             color='Norm. Differenz', color_continuous_scale='RdBu_r',
-             color_continuous_midpoint=0,
+             color='Farbe',
+             color_discrete_map={'Bankrott hoeher': '#E53935', 'Gesund hoeher': '#1E88E5'},
              title='Normierte Median-Differenz (Bankrott vs. Nicht bankrott)')
-fig.update_layout(height=500, coloraxis_showscale=False, yaxis_title='Merkmal')
+fig.update_layout(height=500, yaxis_title='Merkmal',
+                  legend=dict(title='', orientation='h', y=1.05))
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
-st.subheader("Ausreisser-Analyse")
+st.subheader("Ausreißer-Analyse")
 st.markdown("Anteil extremer Werte pro Merkmal (mehr als 3-facher IQR-Abstand).")
 
 q1 = df_all[feat_cols].quantile(0.25)
@@ -139,12 +143,12 @@ q3 = df_all[feat_cols].quantile(0.75)
 iqr = q3 - q1
 outlier_pct = (((df_all[feat_cols] < (q1 - 3*iqr)) | (df_all[feat_cols] > (q3 + 3*iqr))).sum()
                / len(df_all) * 100).sort_values(ascending=False).head(20).reset_index()
-outlier_pct.columns = ['Feature', 'Ausreisser (%)']
+outlier_pct.columns = ['Feature', 'Ausreißer (%)']
 outlier_pct['Feature_kurz'] = outlier_pct['Feature'].str.split('_').str[0]
 
-fig = px.bar(outlier_pct, x='Feature_kurz', y='Ausreisser (%)',
-             color='Ausreisser (%)', color_continuous_scale='Oranges',
-             text='Ausreisser (%)', title='Top-20 Merkmale mit extremen Ausreissern')
+fig = px.bar(outlier_pct, x='Feature_kurz', y='Ausreißer (%)',
+             color='Ausreißer (%)', color_continuous_scale='Oranges',
+             text='Ausreißer (%)', title='Top-20 Merkmale mit extremen Ausreißern')
 fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
 fig.update_layout(height=420, coloraxis_showscale=False, xaxis_title='Merkmal')
 st.plotly_chart(fig, use_container_width=True)
