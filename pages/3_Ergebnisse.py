@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import plotly.express as px
-import os
 
 st.set_page_config(page_title="Ergebnisse", layout="wide")
 st.title("Ergebnisse")
@@ -25,16 +23,6 @@ erkennt aber keine einzige Insolvenz. Stattdessen werden folgende Metriken verwe
 | **Precision (Bankrott)** | Anteil der korrekt erkannten Insolvenzen an allen vom Modell als Insolvenz eingestuften Fällen. Niedrige Precision bedeutet viele Fehlalarme. |
 | **Recall (Bankrott)** | Anteil der tatsächlichen Insolvenzen, die das Modell erkennt. Niedriger Recall bedeutet viele übersehene Insolvenzen. |
 """)
-
-MODELS_DIR = 'models'
-
-if not os.path.exists(os.path.join(MODELS_DIR, 'results.pkl')):
-    st.warning(
-        "Modelle noch nicht trainiert. Bitte zuerst 'python train_models.py' ausfuehren.")
-    st.stop()
-
-with open(os.path.join(MODELS_DIR, 'results.pkl'), 'rb') as f:
-    xgb_results = pickle.load(f)
 
 all_results = pd.DataFrame([
     {'Jahr': 1, 'Horizont': '5 Jahr(e)', 'Modell': 'Logistic Regression', 'ROC-AUC': 0.7535,
